@@ -1,3 +1,4 @@
+# Maven
 target/
 pom.xml.tag
 pom.xml.releaseBackup
@@ -15,3 +16,27 @@ buildNumber.properties
 .project
 # JDT-specific (Eclipse Java Development Tools)
 .classpath
+
+# Jenkins
+# Local Jenkins runtime directory generated during 'mvn hpi:run' testing
+work/
+
+# Configuration-as-Code plugin test artifacts (if used in tests)
+/jenkins.yaml
+/plugin/jenkins.yaml
+plugins.txt
+
+# Benchmark reports (JMH)
+jmh-report*.json
+
+# Visual Studio Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/*.code-snippets
+!*.code-workspace
+
+# Built Visual Studio Code Extensions
+*.vsix

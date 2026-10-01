@@ -1,0 +1,15 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core">
+  <j:set var="comp" value="${c != null ? c : it}"/>
+  <j:set var="data" value="${from.data(comp)}"/>
+  <td align="right" data="${data}">
+    <j:choose>
+      <j:when test="${data != null}">
+        ${data.shortName} (${data.cores} cores)
+      </j:when>
+      <j:otherwise>
+        <span class="jenkins-!-warning-color">N/A</span>
+      </j:otherwise>
+    </j:choose>
+  </td>
+</j:jelly>
