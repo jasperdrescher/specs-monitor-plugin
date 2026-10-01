@@ -15,11 +15,11 @@ public class CpuInfo implements Serializable {
 			Pattern.CASE_INSENSITIVE);
 
 	private final String name;
-	private final int cores;
+	private final int threads;
 
 	public CpuInfo(String name, int cores) {
 		this.name = name;
-		this.cores = cores;
+		this.threads = cores;
 	}
 
 	public String getName() {
@@ -27,17 +27,17 @@ public class CpuInfo implements Serializable {
 	}
 
 	public String getShortName() {
-        String s = NOISE.matcher(name == null ? "" : name).replaceAll(" ")
-                .replaceAll("\\s+", " ").trim();
-        return s.isEmpty() ? name : s;
-    }
+		String s = NOISE.matcher(name == null ? "" : name).replaceAll(" ")
+				.replaceAll("\\s+", " ").trim();
+		return s.isEmpty() ? name : s;
+	}
 
-	public int getCores() {
-		return cores;
+	public int getThreads() {
+		return threads;
 	}
 
 	@Override
 	public String toString() {
-		return getShortName() + " (" + cores + ")";
+		return getShortName() + " (" + threads + ")";
 	}
 }
