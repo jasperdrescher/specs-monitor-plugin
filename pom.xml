@@ -43,7 +43,7 @@
     <revision>1.0</revision>
     <changelist>-SNAPSHOT</changelist>
     <!-- https://www.jenkins.io/doc/developer/plugin-development/choosing-jenkins-baseline/ -->
-    <jenkins.baseline>2.528</jenkins.baseline>
+    <jenkins.baseline>2.462</jenkins.baseline>
     <jenkins.version>${jenkins.baseline}.3</jenkins.version>
     <!-- Must match the real GitHub repository. If the plugin is hosted under jenkinsci,
          the repo must be named specsmonitor-plugin (or rename the artifactId to specs-monitor). -->
@@ -60,7 +60,7 @@
         <!-- Pick up common dependencies for the selected LTS line: https://github.com/jenkinsci/bom#usage -->
         <groupId>io.jenkins.tools.bom</groupId>
         <artifactId>bom-${jenkins.baseline}.x</artifactId>
-        <version>6237.v4da_61a_4a_19e5</version>
+        <version>4228.v0a_71308d905b_</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
