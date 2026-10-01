@@ -3,6 +3,7 @@ package io.jenkins.plugins.specsmonitor;
 import java.io.Serializable;
 import java.util.regex.Pattern;
 
+/** CPU model name and number of logical processors of a node. */
 public class CpuInfo implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -34,6 +35,7 @@ public class CpuInfo implements Serializable {
         return s.isEmpty() ? name : s;
     }
 
+    /** Number of logical processors (threads) available to the JVM on the node. */
     public int getThreads() {
         return threads;
     }

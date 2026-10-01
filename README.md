@@ -1,28 +1,55 @@
-# specsmonitor
+# Specs Monitor
 
 ## Introduction
 
-TODO Describe what your plugin does here
+Adds a node monitor that shows the CPU model and the number of logical processors of every
+node (built-in node and agents) in the Jenkins node list. This makes it easy to see which
+agents are fast or slow without opening each machine.
+
+The monitor runs on the node itself, so it reports the hardware of that node. Long vendor
+strings such as `13th Gen Intel(R) Core(TM) i9-13900H` are shortened to `i9-13900H`.
+
+Supported operating systems:
+
+- Windows (PowerShell, with a registry fallback)
+- Linux (`/proc/cpuinfo`)
+- macOS (`sysctl`)
+
+If the CPU name cannot be determined, the monitor falls back to the `PROCESSOR_IDENTIFIER`
+environment variable or `unknown`.
 
 ## Getting started
 
-TODO Tell users how to configure your plugin here, include screenshots, pipeline examples and 
-configuration-as-code examples.
+1. Install the plugin.
+2. Go to **Manage Jenkins → Nodes → Configure Monitors** (gear icon).
+3. Enable **Specs Monitor**.
+4. A CPU column appears in the node list, for example `i7-13700K (16)` where the number is the
+   count of logical processors.
+
+### Configuration as Code
+
+```yaml
+jenkins:
+  nodeMonitors:
+    - specsMonitor
+```
 
 ## Issues
 
-TODO Decide where you're going to host your issues, the default is Jenkins JIRA, but you can also enable GitHub issues,
-If you use GitHub issues there's no need for this section; else add the following line:
-
-Report issues and enhancements in the [Jenkins issue tracker](https://issues.jenkins.io/).
+Report issues and enhancements on the
+[GitHub issue tracker](https://github.com/jenkinsci/specs-monitor-plugin/issues).
 
 ## Contributing
 
-TODO review the default [CONTRIBUTING](https://github.com/jenkinsci/.github/blob/master/CONTRIBUTING.md) file and make sure it is appropriate for your plugin, if not then add your own one adapted from the base file
+Refer to the Jenkins
+[contribution guidelines](https://github.com/jenkinsci/.github/blob/master/CONTRIBUTING.md).
 
-Refer to our [contribution guidelines](https://github.com/jenkinsci/.github/blob/master/CONTRIBUTING.md)
+To try the plugin locally:
 
-## LICENSE
+```
+mvn hpi:run
+```
 
-Licensed under MIT, see [LICENSE](LICENSE.md)
+## License
 
+Licensed under MIT, see [LICENSE.md](LICENSE.md).
