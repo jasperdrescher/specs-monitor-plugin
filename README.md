@@ -2,7 +2,7 @@
 
 ## Introduction
 
-Adds a node monitor that shows the CPU model and the number of logical processors of every
+Adds a node monitor that shows the CPU model and the number of hardware threads (logical processors) of every
 node (built-in node and agents) in the Jenkins node list. This makes it easy to see which
 agents are fast or slow without opening each machine.
 
@@ -12,19 +12,18 @@ strings such as `13th Gen Intel(R) Core(TM) i9-13900H` are shortened to `i9-1390
 Supported operating systems:
 
 - Windows (PowerShell, with a registry fallback)
-- Linux (`/proc/cpuinfo`)
+- Linux (`lscpu`, with `/proc/cpuinfo` as a fallback), including x86, ARM (aarch64) and POWER
 - macOS (`sysctl`)
 
-If the CPU name cannot be determined, the monitor falls back to the `PROCESSOR_IDENTIFIER`
-environment variable or `unknown`.
+On other systems (for example AIX or Solaris), or if the CPU name cannot be determined, the
+monitor shows `N/A`.
 
 ## Getting started
 
 1. Install the plugin.
 2. Go to **Manage Jenkins → Nodes → Configure Monitors** (gear icon).
 3. Enable **Specs Monitor**.
-4. A CPU column appears in the node list, for example `i7-13700K (16)` where the number is the
-   count of logical processors.
+4. A CPU column appears in the node list, for example `i7-13700K (16 threads)`.
 
 ### Configuration as Code
 

@@ -53,16 +53,19 @@ class CpuInfoTest {
     }
 
     @Test
-    void getCoresReturnsCoreCount() {
+    void getThreadsReturnsThreadCount() {
         assertEquals(16, new CpuInfo("AMD Ryzen 9 7950X", 16).getThreads());
     }
 
     @Test
-    void toStringUsesShortNameAndCores() {
-        assertEquals("i7-13700K (8)", new CpuInfo("Intel(R) Core(TM) i7-13700K", 8).toString());
+    void toStringUsesShortNameAndThreads() {
+        assertEquals("i7-13700K (8 threads)", new CpuInfo("Intel(R) Core(TM) i7-13700K", 8).toString());
     }
 
-    /** CpuInfo is sent from agent to controller over remoting, so it must survive serialization. */
+    /**
+     * CpuInfo is sent from agent to controller over remoting, so it must survive
+     * serialization.
+     */
     @Test
     void survivesSerializationRoundTrip() throws Exception {
         CpuInfo original = new CpuInfo("AMD Ryzen 7 5800X 8-Core Processor", 16);

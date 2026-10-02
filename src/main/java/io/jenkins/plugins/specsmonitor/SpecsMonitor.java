@@ -11,7 +11,6 @@ import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -24,7 +23,7 @@ import jenkins.security.MasterToSlaveCallable;
 import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 
-/** Node monitor that reports the CPU model and core count of each node. */
+/** Node monitor that reports the CPU model and thread count of each node. */
 public class SpecsMonitor extends NodeMonitor {
 
     @DataBoundConstructor
@@ -47,7 +46,8 @@ public class SpecsMonitor extends NodeMonitor {
 
     /**
      * Runs on the node itself, so it reports the node's hardware. Supports Windows,
-     * Linux and macOS.
+     * Linux and macOS;
+     * other systems report N/A.
      */
     private static final class GetCpuInfo extends MasterToSlaveCallable<CpuInfo, IOException> {
         private static final long serialVersionUID = 1L;
@@ -55,7 +55,6 @@ public class SpecsMonitor extends NodeMonitor {
         private static final Logger LOGGER = Logger.getLogger(GetCpuInfo.class.getName());
         private static final long COMMAND_TIMEOUT_SECONDS = 10;
         private static final long READ_TIMEOUT_SECONDS = 2;
-        private static final List<String> LINUX_NAME_KEYS = List.of("model name", "hardware", "model");
 
         @Override
         public CpuInfo call() throws IOException {
@@ -65,18 +64,26 @@ public class SpecsMonitor extends NodeMonitor {
 
         private static String detectName() {
             String os = System.getProperty("os.name", "").toLowerCase(Locale.ROOT);
-            String name;
+            String name = "";
             if (os.startsWith("windows")) {
                 name = detectWindows();
             } else if (os.startsWith("mac")) {
                 name = tryRun("sysctl", "-n", "machdep.cpu.brand_string");
-            } else {
+            } else if (os.startsWith("linux")) {
                 name = detectLinux();
             }
             if (!name.isBlank()) {
                 return name.replaceAll("\\s+", " ").trim();
             }
-            return System.getenv().getOrDefault("PROCESSOR_IDENTIFIER", "unknown");
+            // Other systems (AIX, Solaris, BSD, ...) and detection failures. The
+            // architecture is already
+            // shown by the built-in architecture monitor, so there is nothing more useful
+            // to report.
+            String identifier = System.getenv("PROCESSOR_IDENTIFIER");
+            if (identifier != null && !identifier.isBlank()) {
+                return identifier;
+            }
+            return "N/A";
         }
 
         private static String detectWindows() {
@@ -100,24 +107,19 @@ public class SpecsMonitor extends NodeMonitor {
         }
 
         private static String detectLinux() {
+            // lscpu knows how to name CPUs that /proc/cpuinfo only describes with numeric
+            // IDs (e.g. aarch64).
+            String name = CpuNameParser.fromLscpu(tryRun("lscpu"));
+            if (!name.isEmpty()) {
+                return name;
+            }
             try {
-                List<String> lines = Files.readAllLines(Path.of("/proc/cpuinfo"), StandardCharsets.UTF_8);
-                // Prefer "model name" (x86), then "hardware"/"model" (some ARM systems).
-                for (String key : LINUX_NAME_KEYS) {
-                    for (String line : lines) {
-                        int colon = line.indexOf(':');
-                        if (colon > 0 && line.substring(0, colon).trim().equalsIgnoreCase(key)) {
-                            String value = line.substring(colon + 1).trim();
-                            if (!value.isEmpty()) {
-                                return value;
-                            }
-                        }
-                    }
-                }
+                return CpuNameParser.fromProcCpuinfo(
+                        Files.readAllLines(Path.of("/proc/cpuinfo"), StandardCharsets.UTF_8));
             } catch (IOException e) {
                 LOGGER.log(Level.FINE, "Could not read /proc/cpuinfo", e);
+                return "";
             }
-            return "";
         }
 
         /**
@@ -137,7 +139,12 @@ public class SpecsMonitor extends NodeMonitor {
         }
 
         private static String run(String... cmd) throws IOException, InterruptedException {
-            Process p = new ProcessBuilder(cmd).redirectErrorStream(true).start();
+            ProcessBuilder builder = new ProcessBuilder(cmd).redirectErrorStream(true);
+            // Make tool output independent of the node's locale (e.g. "Model name:" in
+            // lscpu).
+            builder.environment().put("LC_ALL", "C");
+            builder.environment().put("LANG", "C");
+            Process p = builder.start();
             try {
                 p.getOutputStream().close(); // PowerShell can wait on stdin otherwise
                 CompletableFuture<String> output = CompletableFuture.supplyAsync(() -> readAll(p));

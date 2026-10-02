@@ -5,7 +5,7 @@
   <td align="right" data="${data}">
     <j:choose>
       <j:when test="${data != null}">
-        ${data.shortName} (${data.cores} cores)
+        ${data.shortName} (${data.threads} Threads)
       </j:when>
       <j:otherwise>
         <span class="jenkins-!-warning-color">N/A</span>

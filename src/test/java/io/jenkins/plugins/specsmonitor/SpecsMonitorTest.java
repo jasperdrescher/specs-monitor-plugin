@@ -36,7 +36,7 @@ class SpecsMonitorTest {
     /**
      * The callable must never throw on a non-Windows machine (e.g. Linux CI); it
      * should
-     * fall back gracefully and still report the core count.
+     * fall back gracefully and still report the thread count.
      */
     @Test
     void callableReturnsResultOnAnyOs(JenkinsRule j) throws Exception {
